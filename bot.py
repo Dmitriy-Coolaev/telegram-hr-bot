@@ -9,12 +9,18 @@ from dotenv import load_dotenv
 import os
 
 # Загружаем переменные из .env
-load_dotenv()
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+# Загружаем переменные из .env (если файл есть)
+from pathlib import Path
+env_path = Path('.') / '.env'
+if env_path.exists():
+    from dotenv import load_dotenv
+    load_dotenv(env_path)
 
-# Проверяем наличие токена
+# Получаем токен из переменных окружения
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+
 if not BOT_TOKEN:
-    raise ValueError("❌ BOT_TOKEN не найден в .env")
+    raise ValueError("❌ BOT_TOKEN не найден! Проверь .env локально или переменные Railway")
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
