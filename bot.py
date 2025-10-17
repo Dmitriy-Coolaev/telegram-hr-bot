@@ -17,10 +17,13 @@ if env_path.exists():
     load_dotenv(env_path)
 
 # Получаем токен из переменных окружения
-BOT_TOKEN = "8301872894:AAFIeLfIOkUetGjWo7fBbMleHYVDN8KoJBU"
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
-print("DEBUG: env keys =", list(os.environ.keys()))
-print("DEBUG: BOT_TOKEN =", os.environ.get("BOT_TOKEN"))
+if os.getenv("RAILWAY_ENVIRONMENT"):
+    print("Running on Railway environment")
+    print("Environment keys:", list(os.environ.keys()))
+else:
+    print("Running locally")
 
 if not BOT_TOKEN:
     raise ValueError("❌ BOT_TOKEN не найден! Проверь .env локально или переменные Railway")
@@ -111,5 +114,3 @@ async def show_result(chat_id, user_id):
 # --- Запуск бота ---
 if __name__ == "__main__":
     asyncio.run(dp.start_polling(bot))
-
-
