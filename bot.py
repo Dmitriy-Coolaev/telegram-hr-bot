@@ -17,7 +17,7 @@ if env_path.exists():
     load_dotenv(env_path)
 
 # Получаем токен из переменных окружения
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
+BOT_TOKEN = 8301872894:AAFIeLfIOkUetGjWo7fBbMleHYVDN8KoJBU
 
 print("DEBUG: env keys =", list(os.environ.keys()))
 print("DEBUG: BOT_TOKEN =", os.environ.get("BOT_TOKEN"))
@@ -111,3 +111,4 @@ async def show_result(chat_id, user_id):
 # --- Запуск бота ---
 if __name__ == "__main__":
     asyncio.run(dp.start_polling(bot))
+
