@@ -8,10 +8,6 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from dotenv import load_dotenv
 import os
 
-print("DEBUG: env keys =", list(os.environ.keys()))
-print("DEBUG: BOT_TOKEN =", os.environ.get("BOT_TOKEN"))
-
-
 # Загружаем переменные из .env
 # Загружаем переменные из .env (если файл есть)
 from pathlib import Path
@@ -22,6 +18,9 @@ if env_path.exists():
 
 # Получаем токен из переменных окружения
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
+
+print("DEBUG: env keys =", list(os.environ.keys()))
+print("DEBUG: BOT_TOKEN =", os.environ.get("BOT_TOKEN"))
 
 if not BOT_TOKEN:
     raise ValueError("❌ BOT_TOKEN не найден! Проверь .env локально или переменные Railway")
