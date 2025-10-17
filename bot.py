@@ -8,6 +8,10 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from dotenv import load_dotenv
 import os
 
+print("DEBUG: env keys =", list(os.environ.keys()))
+print("DEBUG: BOT_TOKEN =", os.environ.get("BOT_TOKEN"))
+
+
 # Загружаем переменные из .env
 # Загружаем переменные из .env (если файл есть)
 from pathlib import Path
