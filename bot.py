@@ -6,10 +6,17 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.filters import CommandStart
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from dotenv import load_dotenv
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+
 import os
 
-ADMIN_ID = 76187973  # ← сюда свой telegram ID
 ADMIN_IDS = {76187973, 862394584}
+
+start_kb = ReplyKeyboardMarkup(resize_keyboard=True)
+start_kb.add(
+    KeyboardButton("Пройти тест"),
+    KeyboardButton("Статистика")
+)
 
 #----
 
@@ -85,9 +92,33 @@ user_data = {}
 async def start(message: Message):
     user_id = message.from_user.id
     user_data[user_id] = {"current_q": 0, "scores": {}}
+    
+    await message.answer(
+        "✨ Добро пожаловать! ✨\nВыбери действие:", 
+        reply_markup=start_kb
+    )
 
-    await message.answer("✨ Какой ты гаджет в DNS? ✨ \nОпредели свою техническую личность!\nЗабудь о скучных гороскопах! Наше истинное «я» куда точнее раскрывают привычные гаджеты. Пройди тест и узнай, какую функцию ты выполняешь в компании друзей и в повседневной жизни.")
-    await send_question(message.chat.id, user_id)
+
+    #await message.answer("✨ Какой ты гаджет в DNS? ✨ \nОпредели свою техническую личность!\nЗабудь о скучных гороскопах! Наше истинное «я» куда точнее раскрывают привычные гаджеты. Пройди тест и узнай, какую функцию ты выполняешь в компании друзей и в повседневной жизни.")
+    #await send_question(message.chat.id, user_id)
+
+@dp.message()
+async def main_menu(message: Message):
+    user_id = message.from_user.id
+    text = message.text
+
+    if text == "Пройти тест":
+        user_data[user_id] = {"current_q": 0, "scores": {}}
+        await message.answer("✨ Какой ты гаджет в DNS? ✨ \nОпредели свою техническую личность!\nЗабудь о скучных гороскопах! Наше истинное «я» куда точнее раскрывают привычные гаджеты. Пройди тест и узнай, какую функцию ты выполняешь в компании друзей и в повседневной жизни.")
+        await send_question(message.chat.id, user_id)
+    elif text == "Статистика":
+        if user_id not in ADMIN_IDS:
+            await message.answer("Нет доступа.")
+            return
+        stats = load_stats()
+        await message.answer(f"👥 Тест прошли: {stats['completed_tests']}")
+    else:
+        await message.answer("Выбери действие с помощью кнопок.")
 
 # --- Отправка вопроса ---
 async def send_question(chat_id, user_id):
