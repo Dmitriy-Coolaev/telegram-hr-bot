@@ -12,10 +12,12 @@ import os
 ADMIN_IDS = {76187973, 862394584}
 
 # --- ReplyKeyboard для главного меню ---
-start_kb = ReplyKeyboardMarkup(resize_keyboard=True)
-start_kb.add(
-    KeyboardButton("Пройти тест"),
-    KeyboardButton("Статистика")
+start_kb = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="Пройти тест")],
+        [KeyboardButton(text="Статистика")]
+    ],
+    resize_keyboard=True
 )
 
 # --- Логирование ---
