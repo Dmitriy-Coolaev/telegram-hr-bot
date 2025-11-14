@@ -8,6 +8,40 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from dotenv import load_dotenv
 import os
 
+ADMIN_ID = 76187973  # ← сюда свой telegram ID
+ADMIN_IDS = {76187973, 862394584}
+
+#----
+
+from datetime import datetime
+
+# --- ЛОГИРОВАНИЕ В ФАЙЛ ---
+logging.basicConfig(
+    filename="bot.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(message)s",
+)
+
+# --- СТАТИСТИКА ---
+def load_stats():
+    if not os.path.exists("stats.json"):
+        return {"completed_tests": 0}
+    with open("stats.json", "r", encoding="utf-8") as f:
+        return json.load(f)
+
+def save_stats(stats):
+    with open("stats.json", "w", encoding="utf-8") as f:
+        json.dump(stats, f, ensure_ascii=False, indent=2)
+
+def increase_completed():
+    stats = load_stats()
+    stats["completed_tests"] += 1
+    save_stats(stats)
+
+#----
+
+
+
 # Загружаем переменные из .env
 # Загружаем переменные из .env (если файл есть)
 from pathlib import Path
@@ -104,12 +138,25 @@ async def show_result(chat_id, user_id):
     # Определяем победителя
     winner = max(scores, key=scores.get)
     result = RESULTS.get(winner, {"description": "Неизвестный персонаж", "image": None})
+    
+    logging.info(
+        f"User {user_id} finished test. Result: {winner}. Scores: {scores}"
+    )
+    increase_completed()
 
     text = f"🏆 <b>Ты — {winner}!</b>\n\n{result['description']}"
     if result.get("image"):
         await bot.send_photo(chat_id, photo=result["image"], caption=text, parse_mode="HTML")
     else:
         await bot.send_message(chat_id, text, parse_mode="HTML")
+
+@dp.message(F.text == "/stats")
+async def cmd_stats(message: Message):
+    if message.from_user.id not in ADMIN_IDS:
+        return await message.answer("Нет доступа.")
+
+    stats = load_stats()
+    await message.answer(f"👥 Тест прошли: {stats['completed_tests']}")
 
 # --- Запуск бота ---
 if __name__ == "__main__":
