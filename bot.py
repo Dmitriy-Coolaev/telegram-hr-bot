@@ -30,7 +30,7 @@ logging.basicConfig(
 # --- Статистика ---
 def load_stats():
     if not os.path.exists("stats.json"):
-        return {"completed_tests": 0, "results": {}}
+        return {"completed": 0, "results": {}}
     with open("stats.json", "r", encoding="utf-8") as f:
         return json.load(f)
 
@@ -46,6 +46,10 @@ def increase_result(result_name: str):
     stats["results"][result_name] = stats["results"].get(result_name, 0) + 1
     save_stats(stats)
    
+def increase_completed():
+    stats = load_stats()
+    stats["completed"] = stats.get("completed", 0) + 1
+    save_stats(stats)
 
 
 # --- Загружаем переменные из .env ---
@@ -102,7 +106,7 @@ async def show_stats(message: Message):
 
     stats = load_stats()
 
-    text = f"👥 Тест прошли: {stats['completed_tests']}\n\n"
+    text = f"👥 Тест прошли: {stats['completed']}\n\n"
 
     results = stats.get("results", {})
 
