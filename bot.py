@@ -30,7 +30,7 @@ logging.basicConfig(
 # --- Статистика ---
 def load_stats():
     if not os.path.exists("stats.json"):
-        return {"completed_tests": 0}
+        return {"completed_tests": 0, "results": {}}
     with open("stats.json", "r", encoding="utf-8") as f:
         return json.load(f)
 
@@ -38,10 +38,15 @@ def save_stats(stats):
     with open("stats.json", "w", encoding="utf-8") as f:
         json.dump(stats, f, ensure_ascii=False, indent=2)
 
-def increase_completed():
+def increase_result(result_name: str):
     stats = load_stats()
-    stats["completed_tests"] += 1
+    if "results" not in stats:
+        stats["results"] = {}
+
+    stats["results"][result_name] = stats["results"].get(result_name, 0) + 1
     save_stats(stats)
+   
+
 
 # --- Загружаем переменные из .env ---
 env_path = os.path.join('.', '.env')
@@ -94,8 +99,21 @@ async def show_stats(message: Message):
     if user_id not in ADMIN_IDS:
         await message.answer("Нет доступа.")
         return
+
     stats = load_stats()
-    await message.answer(f"👥 Тест прошли: {stats['completed_tests']}")
+
+    text = f"👥 Тест прошли: {stats['completed_tests']}\n\n"
+
+    results = stats.get("results", {})
+
+    if not results:
+        text += "Пока никто не завершил тест."
+    else:
+        for name, count in results.items():
+            text += f"{name} — {count}\n"
+
+    await message.answer(text)
+
 
 @dp.message()
 async def unknown_message(message: Message):
@@ -150,8 +168,9 @@ async def show_result(chat_id, user_id):
     winner = max(scores, key=scores.get)
     result = RESULTS.get(winner, {"description": "Неизвестный персонаж", "image": None})
 
-    logging.info(f"User {user_id} finished test. Result: {winner}. Scores: {scores}")
     increase_completed()
+    increase_result(winner)
+
 
     text = f"🏆 <b>Ты — {winner}!</b>\n\n{result['description']}"
     if result.get("image"):
